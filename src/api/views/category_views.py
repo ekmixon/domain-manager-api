@@ -42,12 +42,15 @@ class CategorizationsView(MethodView):
     def get(self):
         """Get all domain categorizations."""
         status = request.args.get("status").split(",")
-        if not status:
-            return jsonify({"message": "Please specify a status"}), 406
-
         return (
-            jsonify(categorization_manager.all(params={"status": {"$in": status}})),
-            200,
+            (
+                jsonify(
+                    categorization_manager.all(params={"status": {"$in": status}})
+                ),
+                200,
+            )
+            if status
+            else (jsonify({"message": "Please specify a status"}), 406)
         )
 
 

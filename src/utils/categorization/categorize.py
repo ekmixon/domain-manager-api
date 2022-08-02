@@ -13,10 +13,16 @@ domain_manager = DomainManager()
 def get_domain_proxies(domain_id: str):
     """Get all proxies for a domain."""
     domain_proxies = categorization_manager.all(params={"domain_id": domain_id})
-    if not domain_proxies:
-        return {"message": "categorization requests for this domain do not exist."}, 200
-
-    return domain_proxies, 200
+    return (
+        (domain_proxies, 200)
+        if domain_proxies
+        else (
+            {
+                "message": "categorization requests for this domain do not exist."
+            },
+            200,
+        )
+    )
 
 
 def post_categorize_request(domain_id: str, domain_name: str, requested_category: str):
@@ -67,7 +73,9 @@ def delete_domain_proxies(domain_id: str):
     proxies = categorization_manager.all(
         params={"domain_id": domain_id}, fields=["status"]
     )
-    if not all(proxy["status"] in ["new", "recategorize"] for proxy in proxies):
+    if any(
+        proxy["status"] not in ["new", "recategorize"] for proxy in proxies
+    ):
         return {"error": "only new proxy requests can be deleted"}, 400
 
     categorization_manager.delete(params={"domain_id": domain_id})

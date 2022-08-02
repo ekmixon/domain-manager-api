@@ -51,13 +51,14 @@ def process(proxy_func, domain_name):
 
     # Check category
     try:
-        if "two_captcha_api_key" in proxy_func.__code__.co_varnames:
-            category = proxy_func(driver, domain_name, api_key)
-        else:
-            category = proxy_func(driver, domain_name)
-        return category
+        return (
+            proxy_func(driver, domain_name, api_key)
+            if "two_captcha_api_key" in proxy_func.__code__.co_varnames
+            else proxy_func(driver, domain_name)
+        )
+
     except Exception as e:
-        print(str(e))
+        print(e)
         return None
     finally:
         driver.quit()

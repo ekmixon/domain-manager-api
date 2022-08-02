@@ -15,4 +15,4 @@ def get_domain():
 
 def get_domains(num=10):
     """Get multiple domains."""
-    return [get_domain() for i in range(0, num)]
+    return [get_domain() for _ in range(num)]

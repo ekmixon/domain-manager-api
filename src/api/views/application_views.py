@@ -25,11 +25,10 @@ class ApplicationsView(MethodView):
         params = dict(request.args)
         if g.is_admin:
             return jsonify(application_manager.all(params=params))
-        else:
-            groups = get_users_group_ids()
-            params.update({"_id": {"$in": groups}})
-            resp = application_manager.all(params=params)
-            return jsonify(resp)
+        groups = get_users_group_ids()
+        params["_id"] = {"$in": groups}
+        resp = application_manager.all(params=params)
+        return jsonify(resp)
 
     def post(self):
         """Create an application."""
@@ -64,10 +63,9 @@ class ApplicationView(MethodView):
 
     def delete(self, application_id):
         """Delete application by id."""
-        application_domains = domain_manager.all(
+        if application_domains := domain_manager.all(
             params={"application_id": {"$eq": application_id}}
-        )
-        if application_domains:
+        ):
             return (
                 jsonify(
                     {

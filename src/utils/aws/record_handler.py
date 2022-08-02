@@ -32,12 +32,9 @@ def modify_record(
     action, hosted_zone_id, record_name, record_type, record_value, record_ttl
 ):
     """Modify a simple record in route53."""
-    records = []
-    for value in record_value.splitlines():
-        records.append({"Value": value})
-
+    records = [{"Value": value} for value in record_value.splitlines()]
     try:
-        resp = route53.change_resource_record_sets(
+        return route53.change_resource_record_sets(
             HostedZoneId=hosted_zone_id,
             ChangeBatch={
                 "Changes": [
@@ -53,7 +50,7 @@ def modify_record(
                 ]
             },
         )
-        return resp
+
     except botocore.exceptions.ClientError as error:
         if (
             error.response["Error"]["Code"] == "InvalidChangeBatch"

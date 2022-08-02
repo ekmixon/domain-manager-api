@@ -33,21 +33,14 @@ class Manager:
 
     def convert_fields(self, fields):
         """Convert list of fields into mongo syntax."""
-        if not fields:
-            return None
-        result = {}
-        for field in fields:
-            result[field] = 1
-        return result
+        return {field: 1 for field in fields} if fields else None
 
     def format_params(self, params):
         """Format params."""
         if not params:
             return {}
         if params.get("_id", {}).get("$in"):
-            new_ids = []
-            for i in params["_id"]["$in"]:
-                new_ids.append(ObjectId(i))
+            new_ids = [ObjectId(i) for i in params["_id"]["$in"]]
             params["_id"]["$in"] = new_ids
         return params
 
@@ -55,10 +48,10 @@ class Manager:
         """Format sortby for pymongo."""
         sorts = []
         for k, v in sortby.items():
-            if v == "DESC":
-                sorts.append((k, pymongo.DESCENDING))
             if v == "ASC":
                 sorts.append((k, pymongo.ASCENDING))
+            elif v == "DESC":
+                sorts.append((k, pymongo.DESCENDING))
         return sorts
 
     def read_data(self, data, many=False):

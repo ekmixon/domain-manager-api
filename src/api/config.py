@@ -1,5 +1,6 @@
 """Contains static vars to be used in application."""
 
+
 # Standard Python Libraries
 import logging
 import os
@@ -47,11 +48,7 @@ EMAIL_SCHEDULE = CronTrigger(
 # static gen
 STATIC_GEN_URL = os.environ.get("STATIC_GEN_URL")
 
-if os.environ.get("PYTESTING"):
-    DB = mongomock.MongoClient().db
-else:
-    DB = get_db()
-
+DB = mongomock.MongoClient().db if os.environ.get("PYTESTING") else get_db()
 # about
 DEPLOYED_DATE = os.environ.get("DEPLOYED_DATE")
 API_COMMIT_ID = os.environ.get("API_COMMIT_ID")

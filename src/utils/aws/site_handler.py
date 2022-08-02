@@ -39,7 +39,7 @@ def launch_domain(domain):
             "is_available": True,
             "is_launching": False,
         }
-        data.update(resp)
+        data |= resp
         domain_manager.update(
             document_id=domain["_id"],
             data=data,
@@ -295,9 +295,7 @@ def delete_dns(domain, endpoint=None):
             },
         )
     except botocore.exceptions.ClientError as error:
-        if error.response["Error"]["Code"] == "InvalidChangeBatch":
-            pass
-        else:
+        if error.response["Error"]["Code"] != "InvalidChangeBatch":
             raise error
 
     try:
@@ -323,9 +321,7 @@ def delete_dns(domain, endpoint=None):
             },
         )
     except botocore.exceptions.ClientError as error:
-        if error.response["Error"]["Code"] == "InvalidChangeBatch":
-            pass
-        else:
+        if error.response["Error"]["Code"] != "InvalidChangeBatch":
             raise error
 
     try:
@@ -353,9 +349,7 @@ def delete_dns(domain, endpoint=None):
             },
         )
     except botocore.exceptions.ClientError as error:
-        if error.response["Error"]["Code"] == "InvalidChangeBatch":
-            pass
-        else:
+        if error.response["Error"]["Code"] != "InvalidChangeBatch":
             raise error
 
 
@@ -437,9 +431,7 @@ def delete_ssl_certs(domain):
                 },
             )
         except botocore.exceptions.ClientError as error:
-            if error.response["Error"]["Code"] == "InvalidChangeBatch":
-                pass
-            else:
+            if error.response["Error"]["Code"] != "InvalidChangeBatch":
                 raise error
 
     try:
@@ -480,23 +472,20 @@ def verify_hosted_zone(domain):
     except Exception as e:
         logger.exception(e)
         raise e
-    ns_servers = []
-    for answer in response.answer[0]:
-        ns_servers.append(answer.to_text())
+    ns_servers = [answer.to_text() for answer in response.answer[0]]
     if len(set(ns_servers) - set(new_nameservers)) > 0:
         raise Exception("Route53 nameservers don't match NS lookup.")
 
 
 def verify_launch_records(domain):
     """Verify that no DNS records will clash on launch."""
-    bad_records = list(
+    if bad_records := list(
         filter(
             lambda x: x["name"] in [f"www.{domain['name']}", domain["name"]]
             and x["record_type"] == "A",
             domain.get("records", []),
         )
-    )
-    if bad_records:
+    ):
         raise Exception(
             "You cannot have an A apex record or an A www record before launching the domain."
         )

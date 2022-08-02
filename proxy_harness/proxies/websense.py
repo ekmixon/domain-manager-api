@@ -20,15 +20,14 @@ def req_check():
     # https://bandit.readthedocs.io/en/latest/blacklists/blacklist_calls.html#b310-urllib-urlopen
     response = urllib.request.urlopen(request)  # nosec
     resp = response.read().decode("utf-8")
-    num_remaining = re.findall('reports">(.*?) report', resp, re.DOTALL)[0]
-    return num_remaining
+    return re.findall('reports">(.*?) report', resp, re.DOTALL)[0]
 
 
 def check_category(driver, domain):
     """Check domain category on Websense."""
     print("Checking Websense proxy")
     num_remaining = "1"
-    print("Forcepoint: You have " + num_remaining + " requests left for the day.")
+    print(f"Forcepoint: You have {num_remaining} requests left for the day.")
     if int(num_remaining) > 0:
         driver.get("http://csi.websense.com/")
         driver.set_window_size(1765, 1040)

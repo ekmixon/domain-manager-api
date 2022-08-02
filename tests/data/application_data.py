@@ -20,4 +20,4 @@ def get_application():
 
 def get_applications(num=10):
     """Get multiple apps."""
-    return [get_application() for i in range(0, num)]
+    return [get_application() for _ in range(num)]

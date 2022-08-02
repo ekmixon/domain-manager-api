@@ -167,11 +167,12 @@ class TemplateApprovalView(MethodView):
         """Disapprove a previously approved template."""
         template = template_manager.get(document_id=template_id)
 
-        if not template.get("is_approved", True):
-            return jsonify({"error": "This template is not yet approved"}), 400
-
-        return jsonify(
-            template_manager.update(
-                document_id=template_id, data={"is_approved": False}
+        return (
+            jsonify(
+                template_manager.update(
+                    document_id=template_id, data={"is_approved": False}
+                )
             )
+            if template.get("is_approved", True)
+            else (jsonify({"error": "This template is not yet approved"}), 400)
         )

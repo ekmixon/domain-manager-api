@@ -26,8 +26,7 @@ class UsersView(MethodView):
 
     def get(self):
         """Get all users."""
-        application = request.args.get("application")
-        if application:
+        if application := request.args.get("application"):
             return jsonify(get_users_in_group(application))
 
         self.aws_users = cognito.list_users()
@@ -255,9 +254,9 @@ class UserAPIKeyView(MethodView):
 class UserHelpers:
     """Helper Class for user management."""
 
-    def merge_additional_keys(base_dict, dict_to_add):
+    def merge_additional_keys(self, dict_to_add):
         """Merge Dicts."""
         for key in dict_to_add:
-            if key not in base_dict:
-                base_dict[key] = dict_to_add[key]
-        return base_dict
+            if key not in self:
+                self[key] = dict_to_add[key]
+        return self

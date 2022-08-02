@@ -57,7 +57,7 @@ def process(proxy_func, proxy_category, domain_name):
         )
         time.sleep(3)
     except Exception as e:
-        print(str(e))
+        print(e)
     finally:
         driver.quit()
 

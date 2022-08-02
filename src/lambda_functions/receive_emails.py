@@ -22,12 +22,11 @@ email_manager = EmailManager()
 def get_email_payload(content):
     """Get Email payload body."""
     message = email.message_from_string(content)
-    if message.is_multipart():
-        for part in message.walk():
-            if part.get_content_type() == "text/html":
-                return part.get_payload(decode=True).decode("ASCII")
-    else:
+    if not message.is_multipart():
         return message.get_payload(decode=True).decode("ASCII")
+    for part in message.walk():
+        if part.get_content_type() == "text/html":
+            return part.get_payload(decode=True).decode("ASCII")
 
 
 def forward_email(message):

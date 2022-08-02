@@ -43,9 +43,7 @@ class Cognito(AWS):
         user = self.client.admin_get_user(
             UserPoolId=COGNTIO_USER_POOL_ID, Username=username
         )
-        if return_email:
-            return get_email_from_user(user)
-        return user
+        return get_email_from_user(user) if return_email else user
 
     def get_admin_users(self, return_emails: bool = False):
         """Get admin users from cognito."""
@@ -53,16 +51,12 @@ class Cognito(AWS):
             UserPoolId=COGNTIO_USER_POOL_ID, GroupName=COGNITO_ADMIN_GROUP
         )["Users"]
 
-        if return_emails:
-            return get_emails_from_users(users)
-        return users
+        return get_emails_from_users(users) if return_emails else users
 
     def list_users(self, return_emails: bool = False):
         """List users in cognito."""
         users = self.client.list_users(UserPoolId=COGNTIO_USER_POOL_ID)["Users"]
-        if return_emails:
-            return get_emails_from_users(users)
-        return users
+        return get_emails_from_users(users) if return_emails else users
 
     def disable_user(self, username: str):
         """Disable user in cognito."""

@@ -61,13 +61,10 @@ class DomainsView(MethodView):
     def get(self):
         """Get all domains."""
         params = dict(request.args)
-        if g.is_admin:
-            response = domain_manager.all(params=params)
-        else:
+        if not g.is_admin:
             groups = get_users_group_ids()
-            params.update({"application_id": {"$in": groups}})
-            response = domain_manager.all(params=params)
-
+            params["application_id"] = {"$in": groups}
+        response = domain_manager.all(params=params)
         applications = application_manager.all()
 
         for domain in response:
@@ -616,11 +613,14 @@ class DomainApprovalView(MethodView):
         """Disapprove previously approved content."""
         domain = domain_manager.get(document_id=domain_id)
 
-        if not domain.get("is_approved", True):
-            return jsonify({"error": "This content is not yet approved"}), 400
-
-        return jsonify(
-            domain_manager.update(document_id=domain_id, data={"is_approved": False})
+        return (
+            jsonify(
+                domain_manager.update(
+                    document_id=domain_id, data={"is_approved": False}
+                )
+            )
+            if domain.get("is_approved", True)
+            else (jsonify({"error": "This content is not yet approved"}), 400)
         )
 
 
